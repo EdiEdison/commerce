@@ -1,0 +1,58 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2><strong>Listing: {{listing.title}}</strong></h2>
+    {% if messages %}
+        {%  for message in messages %}
+            <div class="alert alert-danger" role="alert">
+                {{message}}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+        
+        <img src="{{ listing.image.url }}" alt="{{item.title}}" width="500" height="200">
+        <p>{{listing.description}}</p>
+        <p><strong>{{listing.price}} $</strong></p>
+        <p>{{listing.starting_bid}} bid(s) so far</p>
+
+        <form action="{% url 'place_bid' listing.id%}" method="post">
+            {% csrf_token %}
+            <input type="text" class="form-control mb-2" name="bid_value" placeholder="Bid">
+            <button class="btn btn-primary mb-4" type="submit">Place Bid</button>
+        </form>
+
+        <hr>
+
+
+        <h3><strong>Details</strong></h3>
+        <ul>
+            <li>Listed by {{request.user}}</li>
+            <li>Category : {{listing.category}}</li>
+        </ul>
+        <form method="post" action="{% url 'watch_list' listing.id%}" class="mb-4">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">Add to Watch List</button>
+        </form>
+
+
+        {% if request.user == listing.user %}
+            <form method="post" action="{% url 'close_auction' listing.id%}" class="mb-4">
+                {% csrf_token %}
+                <button class="btn btn-danger" type="submit">Close Auction</button>
+            </form>
+        {% endif %}
+
+        <hr>
+
+        
+        <h2>Comments</h2>
+        {% for comment in comments %}
+            <p>{{comment.description}}</p>
+            <p>By {{comment.user}}</p>
+            {% empty %}
+                <p>No comments yet.</p>
+        {% endfor %}
+
+        <a href="{% url 'create_comment' listing.id%}">Create Comment</a>
+{% endblock %}
